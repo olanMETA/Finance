@@ -10,8 +10,13 @@ from telegram.ext import (
 
 # ========== НАСТРОЙКИ ==========
 BOT_TOKEN = "8880279666:AAGGb732K9jesymvXEI1QeNOTZrkm3Abq3E"
+OWNER_ID = 1780854025  # только этот пользователь может пользоваться ботом
 DATA_FILE = "finance_data.json"
 # ================================
+
+def is_owner(update: Update) -> bool:
+    user_id = update.effective_user.id if update.effective_user else None
+    return user_id == OWNER_ID
 
 logging.basicConfig(level=logging.INFO)
 
@@ -257,6 +262,9 @@ def get_history():
 
 # ========== ХЭНДЛЕРЫ ==========
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_owner(update):
+        await update.message.reply_text("⛔ Доступ запрещён.")
+        return ConversationHandler.END
     data = load_data()
     if data["deposit"]["initial"] == 0 and not data["transactions"]:
         await update.message.reply_text(
@@ -292,6 +300,9 @@ async def enter_initial_balance(update: Update, context: ContextTypes.DEFAULT_TY
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+    if not is_owner(update):
+        await query.edit_message_text("⛔ Доступ запрещён.")
+        return ConversationHandler.END
     data_cb = query.data
 
     # ГЛАВНОЕ МЕНЮ
