@@ -1,4 +1,3 @@
-cat > /mnt/user-data/outputs/finance_bot.py << 'ENDOFFILE'
 import os
 import json
 import logging
@@ -707,5 +706,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-ENDOFFILE
-echo "Done"
